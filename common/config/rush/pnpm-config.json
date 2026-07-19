@@ -12,7 +12,10 @@
    *   - asn1.js floated *down* to 4.x, which needs a Node 'vm' polyfill.
    *   - @types/react / @types/react-dom floated to a mix of 18.3 / 19.x versions;
    *     the multiple copies produce incompatible ReactNode types across the app.
-   *     Force a single React 18 typings version to match react@18.
+   *     Force a single React 18 typings version to match react@18. The override is
+   *     version-scoped to >=18 so it does NOT rewrite bemuse-docs's @types/react
+   *     ^17 — rewriting that to 18 trips Rush's frozen-install "missing dependency"
+   *     check the next time the lockfile is regenerated.
    * Holding them at their previously-locked versions keeps the build identical
    * while the toolchain modernizes. Bumping these (or migrating the app to Vite)
    * is a separate effort.
@@ -21,7 +24,7 @@
     "webpack": "5.75.0",
     "pegjs-loader": "0.5.6",
     "asn1.js": "5.4.1",
-    "@types/react": "18.0.26",
-    "@types/react-dom": "18.0.10"
+    "@types/react@>=18.0.0": "18.0.26",
+    "@types/react-dom@>=18.0.0": "18.0.10"
   }
 }
