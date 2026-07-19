@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Set up project
         uses: ./.github/actions/setup-project
       - name: Build
@@ -44,7 +44,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload artifact
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: bemuse-build-${{ github.sha }}
           path: dist.tar.gz
@@ -58,15 +58,20 @@ jobs:
     with:
       tag: ${{ needs.build.outputs.released-tag }}
   e2e:
-    runs-on: ubuntu-latest
+    # Pinned to 22.04: the project's Playwright (1.29) resolves system deps for
+    # `--with-deps` using package names (libasound2, libffi7, …) that no longer
+    # exist on Ubuntu 24.04 (now ubuntu-latest). Upgrading Playwright to a version
+    # that supports 24.04 would require Node >= 18, conflicting with this repo's
+    # Node 16 pin, so pin the runner instead until the toolchain is modernized.
+    runs-on: ubuntu-22.04
     needs: build
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Set up project
         uses: ./.github/actions/setup-project
       - name: Download build
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: bemuse-build-${{ github.sha }}
           path: '.'
@@ -81,7 +86,7 @@ jobs:
           cd e2e
           npx playwright test
       - name: Upload test report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: playwright-report
@@ -90,7 +95,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Set up project
         uses: ./.github/actions/setup-project
       - name: Build dependencies
@@ -102,7 +107,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Set up project
         uses: ./.github/actions/setup-project
       - name: Build
@@ -127,7 +132,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Set up project
         uses: ./.github/actions/setup-project
       - name: Build
@@ -135,21 +140,21 @@ jobs:
       - name: Test
         run: node ../common/scripts/install-run-rushx.js test
         working-directory: bemuse
-      - uses: codecov/codecov-action@v2
+      - uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
   test_packages:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Set up project
         uses: ./.github/actions/setup-project
       - name: Build
         run: node common/scripts/install-run-rush.js build --to-except bemuse
       - name: Test Packages
         run: node common/scripts/install-run-rush.js test --to-except bemuse
-      - uses: codecov/codecov-action@v2
+      - uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
   changelog:
@@ -163,7 +168,7 @@ jobs:
         }}/new/${{ github.event.pull_request.head.ref }}
     steps:
       - name: Generate changelog file
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           script: |
             const path = `changelog/pr-${process.env.PR}.md`
