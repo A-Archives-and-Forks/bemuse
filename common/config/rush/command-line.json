@@ -53,6 +53,18 @@
       "allowWarningsInSuccessfulBuild": true
     },
     {
+      // Override the built-in "build"/"rebuild" commands so that build-time warnings
+      // (e.g. Browserslist's "caniuse-lite is outdated" notice) do not fail the build.
+      // This matches the "lint" and "test" commands above. Without it, a benign warning
+      // causes a nonzero exit that aborts before the dist bundle is assembled.
+      "name": "build",
+      "commandKind": "bulk",
+      "summary": "Build projects.",
+      "enableParallelism": true,
+      "incremental": true,
+      "allowWarningsInSuccessfulBuild": true
+    },
+    {
       "name": "dev",
       "commandKind": "global",
       "summary": "Run development server.",

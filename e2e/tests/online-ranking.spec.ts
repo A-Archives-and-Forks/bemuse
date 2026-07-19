@@ -1,5 +1,12 @@
 import { Page, expect, test } from '@playwright/test'
 
+// These tests share a single fake-scoreboard "tester" account and mutate its
+// server-side state, so they must run in order on a single worker. Under
+// Playwright's non-CI default (fullyParallel), running them concurrently makes
+// "Keeps highest score" flake. CI already runs with workers=1; this makes local
+// runs safe too.
+test.describe.configure({ mode: 'serial' })
+
 test('Can sign up', async ({ page }) => {
   await page.goto('/?flags=fake-scoreboard,skip-to-music-select')
   await page.getByText('Log In / Create an Account').click()
