@@ -58,7 +58,12 @@ jobs:
     with:
       tag: ${{ needs.build.outputs.released-tag }}
   e2e:
-    runs-on: ubuntu-latest
+    # Pinned to 22.04: the project's Playwright (1.29) resolves system deps for
+    # `--with-deps` using package names (libasound2, libffi7, …) that no longer
+    # exist on Ubuntu 24.04 (now ubuntu-latest). Upgrading Playwright to a version
+    # that supports 24.04 would require Node >= 18, conflicting with this repo's
+    # Node 16 pin, so pin the runner instead until the toolchain is modernized.
+    runs-on: ubuntu-22.04
     needs: build
     steps:
       - name: Checkout Repository
