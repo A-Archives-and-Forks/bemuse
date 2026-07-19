@@ -1,0 +1,22 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/rush/v5/pnpm-config.schema.json",
+
+  /**
+   * These overrides freeze a few app/build dependencies to the versions the repo
+   * was previously locked to. Modernizing the toolchain (Node 24 + pnpm 9) forces
+   * a full lockfile regeneration, which floats these transitive deps to newer
+   * releases that break the frozen build:
+   *   - webpack 5.108 tightened the ProgressPlugin schema -> breaks webpackbar
+   *     (Docusaurus / bemuse-docs) and the app build.
+   *   - pegjs-loader 0.5.8 calls loader-utils parseQuery on an empty query.
+   *   - asn1.js floated *down* to 4.x, which needs a Node 'vm' polyfill.
+   * Holding them at their previously-locked versions keeps the build identical
+   * while the toolchain modernizes. Bumping these (or migrating the app to Vite)
+   * is a separate effort.
+   */
+  "globalOverrides": {
+    "webpack": "5.75.0",
+    "pegjs-loader": "0.5.6",
+    "asn1.js": "5.4.1"
+  }
+}
