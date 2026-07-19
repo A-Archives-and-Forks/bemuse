@@ -21,7 +21,7 @@ jobs:
         env:
           GH_APP_CREDENTIALS_TOKEN: ${{ secrets.GH_APP_CREDENTIALS_TOKEN }}
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           token: ${{ steps.get-token.outputs.token }}
       - name: Set up project
