@@ -1,0 +1,100 @@
+name: Preview deployment
+
+# Deploys a preview of each PR's build to an S3-compatible bucket (Linode Object
+# Storage) via rclone, and comments the preview URL on the PR.
+#
+# Asset sharing: the app references all assets by absolute root paths
+# (publicPath/base = "/"), and the JS/CSS/image assets are content-hashed. So the
+# ONLY per-PR file is index.html (deployed under /pr-<n>/); every other file is
+# uploaded to the bucket root and shared across builds. Content hashes make this
+# collision-free, and rclone --checksum skips bytes that already exist — so
+# unchanged assets are never re-uploaded.
+#
+# Crawlers: a single robots.txt at the bucket root disallows everything, so the
+# whole previews.bemuse.ninja domain is kept out of search indexes.
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+env:
+  NODE_FLAGS: --max_old_space_size=4096
+  BUCKET: previews.bemuse.ninja
+  PR: ${{ github.event.pull_request.number }}
+  BASE_URL: https://previews.bemuse.ninja
+  # rclone remote "s3" configured entirely from env (no config file needed).
+  RCLONE_CONFIG_S3_TYPE: s3
+  RCLONE_CONFIG_S3_PROVIDER: Other
+  RCLONE_CONFIG_S3_ENDPOINT: jp-osa-1.linodeobjects.com
+  RCLONE_CONFIG_S3_REGION: jp-osa-1
+  RCLONE_CONFIG_S3_FORCE_PATH_STYLE: 'true'
+  RCLONE_CONFIG_S3_ACL: public-read
+  RCLONE_CONFIG_S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
+  RCLONE_CONFIG_S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
+
+jobs:
+  deploy:
+    if: github.event.action != 'closed'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+      - name: Set up project
+        uses: ./.github/actions/setup-project
+      - name: Build
+        run: |
+          rm -rf dist
+          node build-scripts build
+        env:
+          SCOREBOARD_SERVER: ${{ secrets.SCOREBOARD_SERVER }}
+      - name: Install rclone
+        run: curl -fsSL https://rclone.org/install.sh | sudo bash
+      - name: Upload shared assets (content-hashed + static) to bucket root
+        # Everything except the entry index.html; --checksum so bytes that already
+        # exist (identical hashed chunks, unchanged static files) are skipped.
+        # The service worker is excluded so a single shared origin doesn't serve a
+        # stale cross-PR SW.
+        run: |
+          rclone copy dist/ "s3:${BUCKET}/" \
+            --checksum --transfers 16 --s3-no-check-bucket \
+            --exclude '/index.html' \
+            --exclude '/service-worker.js' \
+            --exclude '/service-worker.js.map' \
+            --exclude '/registerSW.js' \
+            --exclude '/sw.js'
+      - name: Upload per-PR entry (index.html)
+        run:
+          rclone copy dist/index.html "s3:${BUCKET}/pr-${PR}/"
+          --s3-no-check-bucket
+      - name: Keep crawlers out of the whole previews domain
+        run: |
+          printf 'User-agent: *\nDisallow: /\n' | rclone rcat "s3:${BUCKET}/robots.txt" --s3-no-check-bucket
+      - name: Comment the preview URL
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          URL="${BASE_URL}/pr-${PR}/index.html"
+          BODY="🔎 **Preview deploy** for this PR: ${URL}
+
+          Updated for commit \`${GITHUB_SHA::7}\`. Assets are shared at the bucket root (content-hashed); only \`index.html\` is per-PR. The whole \`previews.bemuse.ninja\` domain is \`noindex\` via robots.txt."
+          gh pr comment "$PR" --repo "$GITHUB_REPOSITORY" --edit-last --body "$BODY" \
+            || gh pr comment "$PR" --repo "$GITHUB_REPOSITORY" --body "$BODY"
+
+  cleanup:
+    if: github.event.action == 'closed'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install rclone
+        run: curl -fsSL https://rclone.org/install.sh | sudo bash
+      - name: Remove this PR's entry
+        # Only the per-PR index.html is removed; shared content-hashed assets are
+        # left in place (they're deduped and reused by other builds).
+        run: rclone purge "s3:${BUCKET}/pr-${PR}/" --s3-no-check-bucket || true
