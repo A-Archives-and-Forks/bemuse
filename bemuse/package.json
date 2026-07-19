@@ -130,7 +130,7 @@
     "@radix-ui/react-alert-dialog": "~0.1.5",
     "@reduxjs/toolkit": "^1.9.1",
     "auth0-js": "^9.8.0",
-    "axios": "^1.1.3",
+    "axios": "1.2.2",
     "bemuse-indexer": "^51.0.2",
     "bemuse-notechart": "^50.1.2",
     "bemuse-types": "^50.0.2",
