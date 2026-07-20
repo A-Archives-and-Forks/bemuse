@@ -105,6 +105,12 @@ jobs:
         uses: actions/checkout@v7
       - name: Set up project
         uses: ./.github/actions/setup-project
+      - name: Ensure the generated pegjs parser is up to date
+        working-directory: bemuse
+        run: |
+          node ../common/scripts/install-run-rushx.js build:parser
+          git diff --exit-code -- src/scintillator/expression/parser.js \
+            || { echo "::error::parser.js is stale — run 'rushx build:parser' in bemuse/ and commit"; exit 1; }
       - name: Build
         run: node common/scripts/install-run-rush.js build --to-except bemuse
       - name: Lint and fix all auto-fixable problems
