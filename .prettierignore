@@ -16,4 +16,4 @@ yarn.lock
 package-lock.json
 shrinkwrap.json
 **/*.md
-changelog/*.md
+changelog/*.mdbemuse/src/scintillator/expression/parser.js
