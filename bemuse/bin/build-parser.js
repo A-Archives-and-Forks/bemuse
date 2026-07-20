@@ -17,6 +17,7 @@ const dir = path.join(__dirname, '..', 'src', 'scintillator', 'expression')
 const grammar = fs.readFileSync(path.join(dir, 'parser.pegjs'), 'utf8')
 
 const header =
+  '/* eslint-disable */\n' +
   '// GENERATED FILE — do not edit. Regenerate with `rushx build:parser`.\n'
 const source = peg.generate(grammar, { output: 'source', format: 'commonjs' })
 
