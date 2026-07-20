@@ -17,7 +17,8 @@
     "prod-start": "cross-env NODE_ENV=production HOT=true gulp server",
     "start": "cross-env HOT=true gulp server",
     "test": "cross-env NODE_ENV=test BEMUSE_COV=true gulp test",
-    "lint": "eslint --ext .js,.jsx,.ts,.tsx ."
+    "lint": "eslint --ext .js,.jsx,.ts,.tsx .",
+    "build:parser": "node bin/build-parser.js"
   },
   "importSort": {
     ".js, .jsx, .es6, .es": {

@@ -1,22 +1,16 @@
 import './ErrorDialog.scss'
-
-const escapeHtml = (value) =>
-  String(value)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
+import escape from 'lodash/escape'
 
 function template({ message, url, line, col, e }) {
   return (
     `<h1>An error has occured!</h1>` +
-    `<p>${escapeHtml(message)}</p>` +
+    `<p>${escape(message)}</p>` +
     (url
-      ? `<p class="ErrorDialogのwhere">${escapeHtml(
+      ? `<p class="ErrorDialogのwhere">${escape(
           url + ':' + line + ':' + col
         )}</p>`
       : '') +
-    `<pre wrap="wrap">${escapeHtml(
+    `<pre wrap="wrap">${escape(
       (e && e.stack) || 'No stack trace available'
     )}</pre>` +
     `<div class="ErrorDialogのclose">&times;</div>`
