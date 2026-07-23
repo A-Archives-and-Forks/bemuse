@@ -60,11 +60,17 @@ test('Can submit score to improve', async ({ page }) => {
 })
 
 test('Keeps highest score', async ({ page }) => {
-  await page.goto('/?mode=playground&playground=result&flags=fake-scoreboard')
-  await expect(page.locator('.Ranking')).toContainText('111111')
+  // The `result-lower` playground submits a score (400000) below the score
+  // `tester` already has on this chart (543210), so the higher existing score
+  // must be kept. Asserting the kept score appears in "Your Ranking" is
+  // deterministic — unlike asserting the absence of a value that a legitimate
+  // submission would add (the previous version raced the async submit).
+  await page.goto(
+    '/?mode=playground&playground=result-lower&flags=fake-scoreboard'
+  )
+  await expect(page.locator('.Rankingのleaderboard')).toContainText('543210')
   await logInFromRankingTable(page, 'tester')
-  await expect(page.locator('.Ranking')).toContainText('555554')
-  await expect(page.locator('.Ranking')).not.toContainText('543210')
+  await expect(page.locator('.Rankingのyours')).toContainText('543210')
 })
 
 test('Clears data when switching user', async ({ page }) => {
