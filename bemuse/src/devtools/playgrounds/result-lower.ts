@@ -4,7 +4,7 @@ import { showResultPlayground } from '../result-playground'
 // this chart in the fake scoreboard (543210 on md5 fb3dab…, KB — see
 // createFakeScoreboardClient), so submitting it must KEEP the higher existing
 // score. Used by the "Keeps highest score" e2e test.
-export function main() {
+export function main(): void {
   showResultPlayground({
     score: 400000,
     accuracy: 0.9,
