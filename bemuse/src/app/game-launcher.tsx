@@ -1,4 +1,5 @@
 import * as Analytics from './analytics'
+import * as BemuseLogger from 'bemuse/logger'
 import * as Options from './entities/Options'
 
 import { Chart, Song } from 'bemuse/collection-model/types'
