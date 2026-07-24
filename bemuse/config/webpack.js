@@ -62,7 +62,6 @@ function generateBaseConfig() {
     plugins: [
       new CompileProgressPlugin(),
       new webpack.ProvidePlugin({
-        BemuseLogger: 'bemuse/logger',
         process: 'process/browser',
         Buffer: ['buffer', 'Buffer'],
       }),
