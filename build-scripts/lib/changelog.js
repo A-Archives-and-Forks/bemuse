@@ -44,12 +44,15 @@ function updateChangelog(existingChangelog, entries, version = 'UNRELEASED') {
         category: x.category,
       }
     })
+  // Section order in the generated changelog, most user-facing first.
+  // Unlisted categories fall to the end.
+  const categoryOrder = ['New stuff', 'Improvements', 'Bug fixes', 'Internals']
   const bulletPoints = _.chain(bullets)
     .groupBy(b => b.category)
     .map((v, k) => {
       return {
         text: `### ${k}\n\n` + v.map(b => b.text).join('\n'),
-        order: (['New stuff'].indexOf(k) + 1) || 999999,
+        order: (categoryOrder.indexOf(k) + 1) || 999999,
       }
     })
     .sortBy(b => b.order)
