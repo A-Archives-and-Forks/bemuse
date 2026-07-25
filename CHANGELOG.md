@@ -29,6 +29,55 @@
 [@dimitrov-d]: https://github.com/dimitrov-d
 [@s-pace]: https://github.com/s-pace
 
+## 54.0.2
+
+### Bug fixes
+
+- Fixed global time synchronization. [[#857]], by [@dtinth]
+
+### Internals
+
+- Fixed the CI build failing on a benign Browserslist “caniuse-lite is outdated”
+  warning by allowing warnings in a successful `build`, and made the
+  `online-ranking` end-to-end tests run serially so they no longer flake under
+  parallel execution. [[#846]], by [@dtinth]
+- Modernized the build toolchain: Node 24, Rush 5.177, pnpm 9, Playwright 1.61,
+  and the latest GitHub Actions, with the e2e job back on `ubuntu-latest`.
+  [[#847]], by [@dtinth]
+- Version-scoped the `@types/react` pnpm override so regenerating the lockfile
+  no longer breaks Rush's frozen install. [[#849]], by [@dtinth]
+- Added per-PR preview deployments to an S3-compatible bucket (Linode Object
+  Storage) via rclone, with shared content-hashed assets and crawler exclusion.
+  [[#850]], by [@dtinth]
+- Replaced webpack `~` tilde SCSS imports with relative paths as the first step
+  of splitting the Vite migration into reviewable pieces. [[#851]], by [@dtinth]
+- Replaced the pug and pegjs webpack loaders with inlined templates and a
+  precompiled parser as the next step of the Vite migration prep. [[#852]], by
+  [@dtinth]
+- Converted static-asset `require()` calls to ESM `import` (with ambient asset
+  type declarations) as the next step of the Vite migration prep. [[#853]], by
+  [@dtinth]
+- Fixed the flaky `online-ranking › Keeps highest score` end-to-end test by
+  making it deterministically test keeping a higher score. [[#854]], by
+  [@dtinth]
+- Made the ProvidePlugin-injected `BemuseLogger` global and runtime
+  `require('util')` explicit imports (Vite migration prep). [[#855]], by
+  [@dtinth]
+- Order the generated changelog sections as New stuff → Improvements → Bug fixes
+  → Internals. [[#858]], by [@dtinth]
+
+[#846]: https://github.com/bemusic/bemuse/pull/846
+[#847]: https://github.com/bemusic/bemuse/pull/847
+[#849]: https://github.com/bemusic/bemuse/pull/849
+[#850]: https://github.com/bemusic/bemuse/pull/850
+[#851]: https://github.com/bemusic/bemuse/pull/851
+[#852]: https://github.com/bemusic/bemuse/pull/852
+[#853]: https://github.com/bemusic/bemuse/pull/853
+[#854]: https://github.com/bemusic/bemuse/pull/854
+[#855]: https://github.com/bemusic/bemuse/pull/855
+[#857]: https://github.com/bemusic/bemuse/pull/857
+[#858]: https://github.com/bemusic/bemuse/pull/858
+
 ## 54.0.1
 
 ### Bug fixes
