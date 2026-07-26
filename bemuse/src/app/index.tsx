@@ -7,11 +7,7 @@ import {
   getDefaultCustomFolderContext,
   getSongsFromCustomFolders,
 } from 'bemuse/custom-folder'
-import {
-  getInitialGrepString,
-  getMusicServer,
-  getTimeSynchroServer,
-} from './query-flags'
+import { getInitialGrepString, getMusicServer } from './query-flags'
 import {
   shouldShowAbout,
   shouldShowModeSelect,
@@ -79,9 +75,7 @@ export function main() {
   displayFirstScene()
 
   // synchronize time
-  const timeSynchroServer =
-    getTimeSynchroServer() || 'wss://timesynchro.herokuapp.com/'
-  if (timeSynchroServer) now.synchronize(timeSynchroServer)
+  now.synchronize()
 
   trackFullscreenEvents()
 

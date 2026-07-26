@@ -41,7 +41,3 @@ export function getInitialGrepString(): string | undefined {
 export function getInitiallySelectedSong(): string | undefined {
   return query.song
 }
-
-export function getTimeSynchroServer(): string | undefined {
-  return query.BEMUSE_TIMESYNCHRO_SERVER
-}
